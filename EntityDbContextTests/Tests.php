@@ -10,7 +10,7 @@ $phpEntityDbContext = PhpEntityDbContext\PhpEntityDbContextSetting::InitialSetti
 'localhost',
 'phpentitydbcontext',
 'root',
-'');
+'123');
 
 require_once "./Models/Cliente.php";
 $entity = new EntityDbContext(new Cliente);

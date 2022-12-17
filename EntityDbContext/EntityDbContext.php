@@ -108,12 +108,25 @@ class EntityDbContext
             $this->DatabaseConnection = new PDO('mysql:host='.$GLOBALS["DB_HOST"].';dbname='.$GLOBALS["DB_NAME"], $GLOBALS["DB_USER"], $GLOBALS["DB_PASSWORD"]);
             return $this->DatabaseConnection;
         }
-        catch(PDOException $Error)
+        catch(PDOException $error)
         {
-            echo 'error authenticating with the database : ' . $Error->getMessage();
-            //return json_encode('error authenticating with the database : ' . $Error->getMessage());
+            // code error filter | not database
+            $e = explode("SQLSTATE[HY000] [", $error->getMessage());
+            $e = explode("] The server", $e[1]);
+            $e = intval($e[0]);
+            if($e == 1049)
+            {
+                $this->DatabaseConnection = new PDO("mysql:host=".$GLOBALS["DB_HOST"], $GLOBALS["DB_USER"], $GLOBALS["DB_PASSWORD"]);
+                $sql = $this->DatabaseConnection->prepare("CREATE DATABASE IF NOT EXISTS ".$GLOBALS["DB_NAME"].";");
+                $sql->execute();
+                return $this->DatabaseConnection;
+            }
+            else
+            {
+                echo 'error authenticating with the database : ' . $error->getMessage();
+                //return json_encode('error authenticating with the database : ' . $Error->getMessage());
+            }
         }
-        
     }
 
     private function GetDatabaseQuery($query)
